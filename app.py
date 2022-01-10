@@ -43,20 +43,22 @@ def main():
     config = None
     creds = None
 
-    with open("config.yaml") as f:
+    curdir = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(curdir, "config.yaml")) as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    if os.path.exists(os.path.join(curdir, 'token.json')):
+        creds = Credentials.from_authorized_user_file(
+            os.path.join(curdir, 'token.json'), SCOPES)
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                os.path.join(curdir, 'credentials.json'), SCOPES)
             creds = flow.run_local_server(port=0)
-        with open('token.json', 'w') as token:
+        with open(os.path.join(curdir, 'token.json'), 'w') as token:
             token.write(creds.to_json())
 
     date = sys.argv[1]
